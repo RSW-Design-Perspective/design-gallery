@@ -1171,11 +1171,24 @@
                 header.textContent = "✦ Gemini AI が提案しました（タップで選択）";
                 const issue = document.getElementById('issue').value || "特になし";
                 const point = document.getElementById('proposal-point').value || "特になし";
-                const prompt = `あなたは一流のコピーライターです。外構工事（ローラーストーン施工等）の提案書向けに、短いキャッチコピーを3つ考えてください。
+                let prompt = `あなたは一流のコピーライターです。外構工事（ローラーストーン施工等）の提案書向けに、短いキャッチコピーを5つ考えてください。
                 【テーマ・スタイル】: ${currentStyle}
                 【現状の課題】: ${issue}
-                【提案内容】: ${point}
-                ※出力ルール: カギカッコ不要、1行に1案ずつ、合計3行のみ出力すること。`;
+                【提案内容】: ${point}\n`;
+                if (images.hero) prompt += `【参考画像】: ユーザーがアップロードしたメイン画像を視覚情報として渡しました。画像の印象や雰囲気も取り入れてください。\n`;
+                prompt += `※出力ルール: カギカッコ不要、1行に1案ずつ、合計5行のみ出力すること。`;
+
+                const parts = [{ text: prompt }];
+                if (images.hero) {
+                    const base64Data = images.hero.split(',')[1];
+                    const mimeType = images.hero.substring(images.hero.indexOf(':') + 1, images.hero.indexOf(';'));
+                    parts.push({
+                        inlineData: {
+                            mimeType: mimeType,
+                            data: base64Data
+                        }
+                    });
+                }
 
                 try {
                     // 自動モデル判定機能 (2026年以降のモデル名アップデート・非推奨化に自動追従)
@@ -1201,7 +1214,7 @@
                     const res = await fetch(dynamicApiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                        body: JSON.stringify({ contents: [{ parts: parts }] })
                     });
 
                     const data = await res.json();
@@ -1230,7 +1243,7 @@
                     }
 
                     const text = data.candidates[0].content.parts[0].text;
-                    const lines = text.split('\n').map(L => L.replace(/^[-\*\d\.\s]+/, '').trim()).filter(L => L.length > 0).slice(0, 3);
+                    const lines = text.split('\n').map(L => L.replace(/^[-\*\d\.\s]+/, '').trim()).filter(L => L.length > 0).slice(0, 5);
                     renderChips(lines);
                 } catch (err) {
                     console.error("Catch Block err:", err);
@@ -1250,11 +1263,11 @@
 
         function useLocalCopy() {
             const lib = {
-                luxury: ["歳月が証明する、本物の風格をここに。", "威風堂々。住まいの価値を次世代へ継ぐ。", "石積みが語る、邸宅の矜持と美学。"],
-                modern: ["余白に宿る品格。本質的な美を描く。", "日常をアートに変える、洗練のライン。", "都市の風景に、静かな存在感を刻む。"],
-                nature: ["光と影が織りなす、この場所だけの季節。", "自然と共鳴する、上質な暮らしの入口。", "優しく迎え入れる、緑と石の詩情。"],
-                vintage: ["時を刻む。無骨でありながら温かい空間。", "使い込むほどに味が出る、ガレージライクな趣。", "ヴィンテージが創り出す、自分だけの秘密基地。"],
-                resort: ["ここは私邸。まるで高級リゾートのような非日常。", "水面と風が通り抜ける、優雅なリラクゼーション。", "日常をエスケープする、ホテルライクな極上空間。"]
+                luxury: ["歳月が証明する、本物の風格をここに。", "威風堂々。住まいの価値を次世代へ継ぐ。", "石積みが語る、邸宅の矜持と美学。", "洗練極まる、圧倒的な存在感。", "日常を至高の領域へ昇華させる。"],
+                modern: ["余白に宿る品格。本質的な美を描く。", "日常をアートに変える、洗練のライン。", "都市の風景に、静かな存在感を刻む。", "無駄を削ぎ落とした、研ぎ澄まされた空間。", "モダンデザインが導く、新しい暮らしの形。"],
+                nature: ["光と影が織りなす、この場所だけの季節。", "自然と共鳴する、上質な暮らしの入口。", "優しく迎え入れる、緑と石の詩情。", "四季の移ろいを肌で感じる、心地よい庭。", "自然素材が描き出す、温もりある風景。"],
+                vintage: ["時を刻む。無骨でありながら温かい空間。", "使い込むほどに味が出る、ガレージライクな趣。", "ヴィンテージが創り出す、自分だけの秘密基地。", "インダストリアルな美学、唯一無二のデザイン。", "古いものの良さを生かす、新しい価値観。"],
+                resort: ["ここは私邸。まるで高級リゾートのような非日常。", "水面と風が通り抜ける、優雅なリラクゼーション。", "日常をエスケープする、ホテルライクな極上空間。", "心を開放する、プライベートなオアシス。", "特別な時間を演出する、魅惑のエクステリア。"]
             };
             renderChips(lib[currentStyle]);
         }
