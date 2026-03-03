@@ -67,15 +67,58 @@
 
         /* ━━━ LAYOUT ━━━ */
         .workspace {
-            display: grid;
-            grid-template-columns: 380px 1fr;
+            display: flex;
             height: calc(100vh - 57px);
+        }
+
+        .editor-panel {
+            width: 380px;
+            min-width: 300px;
+            max-width: 600px;
+            background: var(--panel);
+            overflow-y: auto;
+            padding: 28px 24px;
+            flex-shrink: 0;
+        }
+
+        .resizer {
+            width: 6px;
+            background: var(--border);
+            cursor: col-resize;
+            flex-shrink: 0;
+            transition: background 0.2s;
+            position: relative;
+            z-index: 10;
+        }
+
+        .resizer:hover,
+        .resizer.dragging {
+            background: var(--gold);
+        }
+
+        .preview-panel {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: #000;
         }
 
         @media (max-width: 900px) {
             .workspace {
-                grid-template-columns: 1fr;
+                flex-direction: column;
                 height: auto;
+            }
+
+            .editor-panel {
+                width: 100% !important;
+                max-width: none;
+                border-right: none;
+                border-bottom: 5px solid var(--border);
+            }
+
+            .resizer {
+                display: none;
             }
 
             .preview-panel {
@@ -83,14 +126,7 @@
             }
         }
 
-        /* ━━━ EDITOR PANEL ━━━ */
-        .editor-panel {
-            background: var(--panel);
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            padding: 28px 24px;
-        }
-
+        /* ━━━ EDITOR PANEL EXT ━━━ */
         .editor-panel::-webkit-scrollbar {
             width: 4px;
         }
@@ -119,87 +155,11 @@
             margin-top: 0;
         }
 
-        /* API KEY ACCORDION */
-        .api-accordion-toggle {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            cursor: pointer;
-            padding: 8px 0;
-            color: #555;
-            font-size: 0.62rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            font-family: 'Cormorant Garamond', serif;
-            border-bottom: 1px solid #222;
-            margin-bottom: 10px;
-            user-select: none;
-        }
-
-        .api-accordion-toggle:hover {
-            color: var(--muted);
-        }
-
-        .api-accordion-arrow {
-            transition: transform 0.2s;
-            font-size: 0.55rem;
-        }
-
-        .api-accordion-toggle.open .api-accordion-arrow {
-            transform: rotate(180deg);
-        }
-
-        .api-accordion-body {
-            display: none;
-        }
-
-        .api-accordion-body.open {
-            display: block;
-        }
-
         /* PROPOSER INFO */
         .proposer-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-        }
-
-        /* API KEY */
-        .api-key-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: #0a0a0a;
-            border: 1px solid #2a2a2a;
-            border-radius: 6px;
-            padding: 10px 12px;
-            margin-bottom: 6px;
-        }
-
-        .api-key-row input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: var(--text);
-            font-size: 0.78rem;
-            outline: none;
-            font-family: 'Courier New', monospace;
-        }
-
-        .api-key-row input::placeholder {
-            color: #444;
-        }
-
-        .api-key-hint {
-            font-size: 0.62rem;
-            color: #555;
-            margin-bottom: 20px;
-            line-height: 1.6;
-        }
-
-        .api-key-hint a {
-            color: var(--gold);
-            text-decoration: none;
         }
 
         /* FORM ELEMENTS */
@@ -746,26 +706,8 @@
 
     <div class="workspace">
         <!-- ━━━ EDITOR ━━━ -->
-        <div class="editor-panel">
-
-            <div class="api-accordion-toggle" id="api-toggle" onclick="toggleApiKey()">
-                <span>🔑 &nbsp; OpenAI API設定（任意）</span>
-                <span class="api-accordion-arrow">▼</span>
-            </div>
-            <div class="api-accordion-body" id="api-body">
-                <div class="api-key-row">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"
-                        stroke-linecap="round">
-                        <rect x="3" y="11" width="18" height="11" rx="2" />
-                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
-                    </svg>
-                    <input type="password" id="api-key" placeholder="sk-... 未入力でも内蔵コピーを使用" autocomplete="off">
-                </div>
-                <p class="api-key-hint">
-                    キーは端末内のみで使用されます。<br>
-                    <a href="https://platform.openai.com/api-keys" target="_blank">→ OpenAI APIキーを取得する</a>
-                </p>
-            </div>
+        <!-- ━━━ EDITOR ━━━ -->
+        <div class="editor-panel" id="editor-panel">
 
             <div class="section-title">01 ｜ 物件・提案情報</div>
             <div class="form-group">
@@ -774,123 +716,112 @@
             </div>
 
             <div class="form-group">
-                <label>現状の課題 → 提案のポイント <span style="color:#444;font-size:0.6rem;">— AIが対比コピーを生成</span></label>
+                <label>現状の課題 → 提案のポイント</label>
                 <div class="contrast-inputs">
                     <div class="contrast-input-wrap">
                         <span class="contrast-tag before">現状の課題</span>
                         <textarea id="issue" rows="3" placeholder="例：駐車場が老朽化&#10;雑草が目立つ&#10;塀が古く暗い印象"
-                            oninput="updatePreview()"></textarea>
+                            oninput="copyToHidden('issue'); updatePreview()"></textarea>
                     </div>
                     <div class="contrast-input-wrap">
                         <span class="contrast-tag after">提案のポイント</span>
                         <textarea id="proposal-point" rows="3" placeholder="例：石畳×緑化で&#10;重厚感と上品さを&#10;両立させた空間へ"
-                            oninput="updatePreview()"></textarea>
+                            oninput="copyToHidden('proposal-point'); updatePreview()"></textarea>
                     </div>
-                </div>
-                <button class="btn-gen-contrast" id="btn-gen-contrast" onclick="generateContrastCopy()">
-                    ✦ &nbsp; AIで対比コピーを生成
-                </button>
-                <div id="contrast-result" class="contrast-result">
-                    <div class="contrast-result-header">✦ AI Generated Contrast Copy</div>
-                    <div id="contrast-chips"></div>
                 </div>
             </div>
 
             <div class="form-group" style="display:none;">
                 <input type="text" id="issue-copy" value="">
-                <input type="text" id="proposal-copy" value="">
-            </div>
-
-            <div class="section-title">02 ｜ スタイル選択</div>
-            <div class="style-selector">
-                <button class="style-btn active" onclick="setStyle('luxury', this)">重厚・高級</button>
-                <button class="style-btn" onclick="setStyle('modern', this)">洗練・モダン</button>
-                <button class="style-btn" onclick="setStyle('nature', this)">自然・情緒</button>
-            </div>
-
-            <div class="section-title">03 ｜ メインビジュアル</div>
-            <div class="form-group">
-                <div class="file-upload-area">
-                    <span class="upload-icon">🖼</span>
-                    <div class="upload-label" id="hero-label">HERO IMAGE をアップロード</div>
-                    <input type="file" accept="image/*" onchange="processImg(this,'hero','hero-label',true)">
+                <div class="section-title">02 ｜ スタイル選択</div>
+                <div class="style-selector">
+                    <button class="style-btn active" onclick="setStyle('luxury', this)">重厚・高級</button>
+                    <button class="style-btn" onclick="setStyle('modern', this)">洗練・モダン</button>
+                    <button class="style-btn" onclick="setStyle('nature', this)">自然・情緒</button>
                 </div>
-            </div>
-            <div class="form-group">
-                <label>キャッチコピー <span style="color:#444;font-size:0.6rem;">— 画像＋スタイルで自動生成</span></label>
-                <input type="text" id="catch" value="" placeholder="画像とスタイルを選ぶと自動生成されます" oninput="updatePreview()">
-            </div>
-            <div id="ai-box" class="ai-copy-box">
-                <div class="ai-copy-header">✦ AI Suggested Copy</div>
-                <div id="ai-chips">
-                    <div class="ai-loading">AIがコピーを考えています...</div>
-                </div>
-            </div>
 
-            <div class="section-title">04 ｜ Before / After</div>
-            <div id="ba-sets-container"></div>
-            <button class="btn-add-ba" onclick="addBaSet()">＋ &nbsp; セットを追加</button>
-
-            <div class="section-title">05 ｜ ラストビジュアル</div>
-            <div class="form-group">
-                <div class="file-upload-area">
-                    <span class="upload-icon">🌙</span>
-                    <div class="upload-label" id="footer-label">俯瞰・夜景イメージをアップロード</div>
-                    <input type="file" accept="image/*" onchange="processImg(this,'footer_img','footer-label')">
-                </div>
-            </div>
-
-            <div class="section-title">06 ｜ 提案者情報</div>
-            <div class="proposer-grid">
+                <div class="section-title">03 ｜ メインビジュアル</div>
                 <div class="form-group">
-                    <label>店舗名 / 会社名</label>
-                    <input type="text" id="proposer-shop" placeholder="例：セメントアーティスト ヌーマン" oninput="updatePreview()">
+                    <div class="file-upload-area">
+                        <span class="upload-icon">🖼</span>
+                        <div class="upload-label" id="hero-label">HERO IMAGE をアップロード</div>
+                        <input type="file" accept="image/*" onchange="processImg(this,'hero','hero-label',true)">
+                    </div>
                 </div>
                 <div class="form-group">
-                    <label>担当者名</label>
-                    <input type="text" id="proposer-name" placeholder="例：氺井 太郎" oninput="updatePreview()">
+                    <label>キャッチコピー</label>
+                    <input type="text" id="catch" value="" placeholder="例：歳月が証明する、本物の風格をここに。" oninput="updatePreview()">
                 </div>
-            </div>
-            <div class="form-group">
-                <label>展示用メッセージ</label>
-                <textarea id="proposer-msg" rows="2" placeholder="例：ご質問・お見積もりはお気軽にご連絡ください。"
-                    oninput="updatePreview()"></textarea>
-            </div>
 
-            <div class="section-title">07 ｜ SNSシェア</div>
-            <div class="form-group">
-                <label>公開URL（シェアに使用）</label>
-                <input type="text" id="lp-url" placeholder="https://yoursite.github.io/...">
-            </div>
-            <div class="share-buttons">
-                <button class="share-btn share-btn-x" onclick="doXShare()">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                    </svg>
-                    X でシェア
-                </button>
-                <button class="share-btn share-btn-ig" onclick="doIgShare()">
-                    <svg viewBox="0 0 24 24">
-                        <path
-                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
-                    </svg>
-                    Instagram へ
-                </button>
-            </div>
-            <div id="ig-guide" class="ig-guide">
-                <div class="ig-guide-title">✦ Instagram 投稿手順</div>
-                <p>
-                    <strong>① 画像が保存されました</strong><br>
-                    Instagramアプリを開いて <strong>新規投稿 → カメラロール</strong> から保存した画像を選択してください。<br><br>
-                    <strong>② キャプションをクリップボードにコピー済み</strong><br>
-                    <span id="ig-caption-preview" style="color:#666; font-size:0.68rem;"></span>
-                </p>
-            </div>
+                <div class="section-title">04 ｜ Before / After</div>
+                <div id="ba-sets-container"></div>
+                <button class="btn-add-ba" onclick="addBaSet()">＋ &nbsp; セットを追加</button>
 
-            <button class="btn-publish" onclick="preparePublish()">▲ &nbsp; 公開用 index.html を生成</button>
+                <div class="section-title">05 ｜ ラストビジュアル</div>
+                <div class="form-group">
+                    <div class="file-upload-area">
+                        <span class="upload-icon">🌙</span>
+                        <div class="upload-label" id="footer-label">俯瞰・夜景イメージをアップロード</div>
+                        <input type="file" accept="image/*" onchange="processImg(this,'footer_img','footer-label')">
+                    </div>
+                </div>
+
+                <div class="section-title">06 ｜ 提案者情報</div>
+                <div class="proposer-grid">
+                    <div class="form-group">
+                        <label>店舗名 / 会社名</label>
+                        <input type="text" id="proposer-shop" placeholder="例：セメントアーティスト ヌーマン" oninput="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label>担当者名</label>
+                        <input type="text" id="proposer-name" placeholder="例：氺井 太郎" oninput="updatePreview()">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>展示用メッセージ</label>
+                    <textarea id="proposer-msg" rows="2" placeholder="例：ご質問・お見積もりはお気軽にご連絡ください。"
+                        oninput="updatePreview()"></textarea>
+                </div>
+
+                <div class="section-title">07 ｜ SNSシェア</div>
+                <div class="form-group">
+                    <label>公開URL（シェアに使用）</label>
+                    <input type="text" id="lp-url" placeholder="https://yoursite.github.io/...">
+                </div>
+                <div class="share-buttons">
+                    <button class="share-btn share-btn-x" onclick="doXShare()">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                        X でシェア
+                    </button>
+                    <button class="share-btn share-btn-ig" onclick="doIgShare()">
+                        <svg viewBox="0 0 24 24">
+                            <path
+                                d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z" />
+                        </svg>
+                        Instagram へ
+                    </button>
+                </div>
+                <div id="ig-guide" class="ig-guide">
+                    <div class="ig-guide-title">✦ Instagram 投稿手順</div>
+                    <p>
+                        <strong>① 画像が保存されました</strong><br>
+                        Instagramアプリを開いて <strong>新規投稿 → カメラロール</strong> から保存した画像を選択してください。<br><br>
+                        <strong>② キャプションをクリップボードにコピー済み</strong><br>
+                        <span id="ig-caption-preview" style="color:#666; font-size:0.68rem;"></span>
+                    </p>
+                </div>
+
+                <button class="btn-publish" onclick="preparePublish()">▲ &nbsp; 公開用 index.html を生成</button>
+
+            </div>
 
         </div>
+
+        <!-- ━━━ RESIZER ━━━ -->
+        <div class="resizer" id="resizer"></div>
 
         <!-- ━━━ PREVIEW ━━━ -->
         <div class="preview-panel">
@@ -907,14 +838,6 @@
         let currentStyle = 'luxury';
         let heroUploaded = false;
         const ANALYTICS_ID = "G-9KY5C7XC36";
-
-        // ─── Api Key Toggle ───
-        function toggleApiKey() {
-            const toggle = document.getElementById('api-toggle');
-            const body = document.getElementById('api-body');
-            toggle.classList.toggle('open');
-            body.classList.toggle('open');
-        }
 
         // ─── BA Set Management ───
         function addBaSet() {
@@ -1034,49 +957,24 @@
         }
 
         // ─── Contrast Copy Generation ───
-        async function generateContrastCopy() {
+        function generateContrastCopy() {
             const issue = document.getElementById('issue').value.trim();
             const point = document.getElementById('proposal-point').value.trim();
-            if (!issue && !point) {
-                alert('「現状の課題」と「提案のポイント」を入力してください。');
-                return;
-            }
+
             const btn = document.getElementById('btn-gen-contrast');
             const box = document.getElementById('contrast-result');
             const chips = document.getElementById('contrast-chips');
+
             btn.disabled = true;
             box.style.display = 'block';
-            chips.innerHTML = '<div class="ai-loading">AIが対比コピーを考えています...</div>';
 
-            const apiKey = document.getElementById('api-key').value.trim();
-            if (!apiKey || !apiKey.startsWith('sk-')) {
-                await new Promise(r => setTimeout(r, 800));
+            // 少しだけ待機時間を設け、AIが考えている風の演出を入れる（不要なら即表示でも可）
+            chips.innerHTML = '<div class="ai-loading">データを生成しています...</div>';
+
+            setTimeout(() => {
                 useLocalContrastCopy(issue, point);
                 btn.disabled = false;
-                return;
-            }
-            try {
-                const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                    body: JSON.stringify({
-                        model: 'gpt-4o-mini',
-                        messages: [
-                            { role: 'system', content: 'あなたは高級住宅外構工事の提案書専門コピーライターです。「現状の課題」と「提案のポイント」をもとに、施主への対比型コピーを3案生成してください。各案は以下のJSON配列形式のみで出力（説明・番号不要）:\n[{"before":"課題を短く15字以内","after":"提案の魅力を格調高く20〜35字"},...]' },
-                            { role: 'user', content: `現状の課題：${issue}\n提案のポイント：${point}\nスタイル：${currentStyle}` }
-                        ],
-                        max_tokens: 400, temperature: 0.85
-                    })
-                });
-                if (!res.ok) throw new Error('API error');
-                const data = await res.json();
-                const raw = data.choices[0].message.content.replace(/```json|```/g, '').trim();
-                renderContrastChips(JSON.parse(raw).slice(0, 3));
-            } catch (err) {
-                console.warn('Contrast copy error:', err.message);
-                useLocalContrastCopy(issue, point);
-            }
-            btn.disabled = false;
+            }, 500);
         }
 
         function useLocalContrastCopy(issue, point) {
@@ -1127,59 +1025,8 @@
         }
 
         // ─── AI Copy ───
-        async function generateAICopy() {
-            const apiKey = document.getElementById('api-key').value.trim();
-            const box = document.getElementById('ai-box');
-            const chips = document.getElementById('ai-chips');
-
-            box.style.display = 'block';
-            chips.innerHTML = '<div class="ai-loading">AIがコピーを考えています...</div>';
-
-            const styleMap = { luxury: '重厚で威厳ある高級邸宅', modern: '洗練されたモダンでスタイリッシュな住宅', nature: '自然と調和した情緒ある和の住宅' };
-
-            if (!apiKey || !apiKey.startsWith('sk-')) {
-                await new Promise(r => setTimeout(r, 700));
-                useLocalCopy();
-                return;
-            }
-
-            try {
-                const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${apiKey}`
-                    },
-                    body: JSON.stringify({
-                        model: 'gpt-4o-mini',
-                        messages: [
-                            {
-                                role: 'system',
-                                content: 'あなたは高級住宅の外構・エクステリア工事専門の広告コピーライターです。提案書のキャッチコピーとして使う、格調高く簡潔な日本語コピーを3案生成してください。各案は15〜35文字程度。番号・記号・説明文は不要で、コピー本文のみを1行ずつ出力してください。'
-                            },
-                            {
-                                role: 'user',
-                                content: `「${styleMap[currentStyle]}」向けの外構提案書用キャッチコピーを3案お願いします。`
-                            }
-                        ],
-                        max_tokens: 220,
-                        temperature: 0.9
-                    })
-                });
-
-                if (!res.ok) throw new Error('API error ' + res.status);
-                const data = await res.json();
-                const lines = data.choices[0].message.content
-                    .split('\n')
-                    .map(l => l.replace(/^[\d\.\-\s・]+/, '').trim())
-                    .filter(l => l.length > 5)
-                    .slice(0, 3);
-
-                renderChips(lines);
-            } catch (err) {
-                console.warn('OpenAI API error:', err.message);
-                useLocalCopy();
-            }
+        function generateAICopy() {
+            useLocalCopy();
         }
 
         function useLocalCopy() {
@@ -1377,11 +1224,46 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             setTimeout(() => alert('index.html を保存しました。\nGitHub Pages 等にアップロードして公開URLをSNSシェア欄に入力してください。'), 300);
         }
 
+        // ─── Resizer ───
+        function initResizer() {
+            const resizer = document.getElementById('resizer');
+            const editorPanel = document.getElementById('editor-panel');
+            const iframe = document.getElementById('output-iframe');
+            let isResizing = false;
+
+            resizer.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                resizer.classList.add('dragging');
+                document.body.style.cursor = 'col-resize';
+                // iframeのポインタイベントを無効化してドラッグ抜けを防ぐ
+                iframe.style.pointerEvents = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+                // 最大600px、最小300px
+                let newWidth = e.clientX;
+                if (newWidth < 300) newWidth = 300;
+                if (newWidth > 600) newWidth = 600;
+                editorPanel.style.width = newWidth + 'px';
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isResizing) {
+                    isResizing = false;
+                    resizer.classList.remove('dragging');
+                    document.body.style.cursor = '';
+                    iframe.style.pointerEvents = 'auto';
+                }
+            });
+        }
+
         window.onload = () => {
             // デフォルト2セット
             addBaSet();
             addBaSet();
             updatePreview();
+            initResizer();
         };
     </script>
 </body>
