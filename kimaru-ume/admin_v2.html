@@ -622,20 +622,48 @@
             text-transform: uppercase;
         }
 
-        .contrast-chip {
-            display: block;
-            background: #0f0f0f;
-            border: 1px solid #242424;
-            border-radius: 5px;
-            padding: 10px 12px;
-            margin-bottom: 7px;
+        .contrast-chip:last-child {
+            margin-bottom: 0;
+        }
+
+        /* ━━━ SAVE / LOAD BUTTONS ━━━ */
+        .save-load-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+            padding: 15px;
+            background: rgba(201, 168, 76, 0.05);
+            border: 1px solid var(--gold-dim);
+            border-radius: 6px;
+        }
+
+        .btn-data {
+            flex: 1;
+            padding: 10px;
+            background: #111;
+            border: 1px solid var(--border);
+            color: #ccc;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
             cursor: pointer;
-            transition: all 0.15s;
+            border-radius: 4px;
+            transition: all 0.2s;
             font-family: 'Noto Serif JP', serif;
         }
 
-        .contrast-chip:last-child {
-            margin-bottom: 0;
+        .btn-data:hover {
+            border-color: var(--gold-dim);
+            color: var(--gold-light);
+        }
+
+        .btn-data.save {
+            background: rgba(201, 168, 76, 0.1);
+            color: var(--gold);
+            border-color: var(--gold-dim);
+        }
+
+        .btn-data.save:hover {
+            background: rgba(201, 168, 76, 0.2);
         }
 
         .contrast-chip:hover {
@@ -732,8 +760,12 @@
 
     <div class="workspace">
         <!-- ━━━ EDITOR ━━━ -->
-        <!-- ━━━ EDITOR ━━━ -->
         <div class="editor-panel" id="editor-panel">
+
+            <div class="save-load-bar">
+                <button class="btn-data save" onclick="saveProjectData()">💾 入力データを一時保存</button>
+                <button class="btn-data load" onclick="loadProjectData()">📂 保存データを復元</button>
+            </div>
 
             <div class="section-title">01 ｜ 物件名・タイトル</div>
             <div class="form-group">
@@ -756,12 +788,12 @@
                     <div class="contrast-input-wrap">
                         <span class="contrast-tag before">現状の課題</span>
                         <textarea id="issue" rows="3" placeholder="例：アプローチの汚れ・ヒビ割れが目立ち、暗い印象を与えている。"
-                            oninput="copyToHidden('issue'); updatePreview()"></textarea>
+                            oninput="updatePreview()"></textarea>
                     </div>
                     <div class="contrast-input-wrap">
                         <span class="contrast-tag after">提案のポイント</span>
                         <textarea id="proposal-point" rows="3" placeholder="例：ローラーストーン施工により、石畳風の明るく高級感のあるアプローチへ一新します。"
-                            oninput="copyToHidden('proposal-point'); updatePreview()"></textarea>
+                            oninput="updatePreview()"></textarea>
                     </div>
                 </div>
             </div>
@@ -900,13 +932,15 @@
     </div>
 
     <script>
-        const images = { hero: '', footer_img: '', material_img: '' };
+        // 案件の全状態保持用
+        let images = { hero: '', footer_img: '', material_img: '' };
         // BA sets: [{id, before:'', after:''}]
         let baSets = [];
         let baIdCounter = 0;
         let currentStyle = 'luxury';
         let heroUploaded = false;
         const ANALYTICS_ID = "G-9KY5C7XC36";
+        // 安定性の高い標準版Flashモデルを明示的に指定
         const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
 
         // --- Gemini Key Management ---
@@ -1151,15 +1185,33 @@
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
                     });
+
                     const data = await res.json();
-                    if (data.error) throw new Error(data.error.message);
+
+                    // ステータスコードが200(正常)以外の場合の詳細なエラーハンドリング
+                    if (!res.ok || data.error) {
+                        const errMsg = data.error ? data.error.message : res.statusText;
+                        const errCode = data.error ? data.error.code : res.status;
+
+                        let userFriendlyMessage = `【Gemini API連携エラー】\nエラー内容: ${errMsg}\n`;
+                        if (errCode === 400) {
+                            userFriendlyMessage += "▶ 考えられる原因: APIキーの入力間違いです。前後に空白が入っていないか確認してください。";
+                        } else if (errCode === 403) {
+                            userFriendlyMessage += "▶ 考えられる原因: Google AI Studio側で、このAPIキーに紐づくプロジェクトの利用設定が完了していないか、権限がありません。";
+                        } else if (errCode === 404) {
+                            userFriendlyMessage += "▶ 考えられる原因: Google側の仕様変更により指定したモデルが見つかりません。";
+                        }
+                        console.error("Gemini API Error Detail:", data);
+                        alert(userFriendlyMessage);
+                        throw new Error(errMsg);
+                    }
 
                     const text = data.candidates[0].content.parts[0].text;
                     const lines = text.split('\n').map(L => L.replace(/^[-\*\d\.\s]+/, '').trim()).filter(L => L.length > 0).slice(0, 3);
                     renderChips(lines);
                 } catch (err) {
-                    console.error(err);
-                    header.textContent = "⚠️ APIエラーのためローカルAIに切り替えました";
+                    console.error("Catch Block err:", err);
+                    header.textContent = "⚠️ APIエラーのためローカルAIに切り替えました (" + err.message.substring(0, 20) + "...)";
                     useLocalCopy();
                 }
                 btn.disabled = false;
@@ -1253,6 +1305,7 @@
             const catchphrase = document.getElementById('catch').value || '';
             const issueCopy = document.getElementById('issue-copy').value || '';
             const propCopy = document.getElementById('proposal-copy').value || '';
+            const matDesc = document.getElementById('material-desc') ? document.getElementById('material-desc').value : '';
 
             // 提案者情報
             const popShop = document.getElementById('proposer-shop').value || '';
@@ -1387,6 +1440,101 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             a.download = 'index.html';
             a.click();
             setTimeout(() => alert('index.html を保存しました。\nGitHub Pages 等にアップロードして公開URLをSNSシェア欄に入力してください。'), 300);
+        }
+
+        // ─── Project Save / Load ───
+        function saveProjectData() {
+            try {
+                const projectData = {
+                    title: document.getElementById('title').value,
+                    issue: document.getElementById('issue').value,
+                    proposalPoint: document.getElementById('proposal-point').value,
+                    catchphrase: document.getElementById('catch').value,
+                    issueCopy: document.getElementById('issue-copy').value,
+                    proposalCopy: document.getElementById('proposal-copy').value,
+                    materialDesc: document.getElementById('material-desc') ? document.getElementById('material-desc').value : '',
+                    proposerShop: document.getElementById('proposer-shop').value,
+                    proposerName: document.getElementById('proposer-name').value,
+                    proposerMsg: document.getElementById('proposer-msg').value,
+                    lpUrl: document.getElementById('lp-url').value,
+                    currentStyle: currentStyle,
+                    images: images,
+                    baSets: baSets
+                };
+
+                // Base64画像を含むため、容量が大きい場合はエラーになる可能性があるためtry-catchでくくる
+                localStorage.setItem('kimaru_project_save', JSON.stringify(projectData));
+
+                // アイコンを一時的にチェックマークにして保存完了をアピール
+                const btn = document.querySelector('.btn-data.save');
+                const origText = btn.innerHTML;
+                btn.innerHTML = '✔️ 保存しました！';
+                btn.style.background = 'rgba(76, 201, 100, 0.2)';
+                btn.style.borderColor = 'rgba(76, 201, 100, 0.5)';
+                btn.style.color = '#fff';
+                setTimeout(() => {
+                    btn.innerHTML = origText;
+                    btn.style.background = '';
+                    btn.style.borderColor = '';
+                    btn.style.color = '';
+                }, 2000);
+            } catch (err) {
+                console.error("Save Error:", err);
+                alert("データの保存に失敗しました。画像サイズが大きすぎる可能性があります（ブラウザの保存容量オーバー）。");
+            }
+        }
+
+        function loadProjectData() {
+            const savedStr = localStorage.getItem('kimaru_project_save');
+            if (!savedStr) {
+                alert("保存されたデータがありません。");
+                return;
+            }
+
+            if (!confirm("保存されているデータを復元しますか？（現在入力されている内容は上書きされます）")) {
+                return;
+            }
+
+            try {
+                const data = JSON.parse(savedStr);
+
+                // テキストボックスの復元
+                if (data.title !== undefined) document.getElementById('title').value = data.title;
+                if (data.issue !== undefined) document.getElementById('issue').value = data.issue;
+                if (data.proposalPoint !== undefined) document.getElementById('proposal-point').value = data.proposalPoint;
+                if (data.catchphrase !== undefined) document.getElementById('catch').value = data.catchphrase;
+                if (data.issueCopy !== undefined) document.getElementById('issue-copy').value = data.issueCopy;
+                if (data.proposalCopy !== undefined) document.getElementById('proposal-copy').value = data.proposalCopy;
+                if (data.materialDesc !== undefined && document.getElementById('material-desc')) document.getElementById('material-desc').value = data.materialDesc;
+                if (data.proposerShop !== undefined) document.getElementById('proposer-shop').value = data.proposerShop;
+                if (data.proposerName !== undefined) document.getElementById('proposer-name').value = data.proposerName;
+                if (data.proposerMsg !== undefined) document.getElementById('proposer-msg').value = data.proposerMsg;
+                if (data.lpUrl !== undefined) document.getElementById('lp-url').value = data.lpUrl;
+
+                // スタイルの復元
+                if (data.currentStyle !== undefined) {
+                    const btn = document.querySelector(`.style-btn[onclick*="'${data.currentStyle}'"]`);
+                    if (btn) setStyle(data.currentStyle, btn);
+                }
+
+                // 画像オブジェクトとBAセットの復元
+                if (data.images !== undefined) images = data.images;
+                if (data.baSets !== undefined) baSets = data.baSets;
+
+                // BAセットのUI再構築
+                renderBaSets();
+
+                // hero画像アップロードフラグの復元
+                heroUploaded = !!images.hero;
+                if (images.hero) document.getElementById('hero-label').textContent = '✅ メイン画像セット済み';
+                if (images.material_img && document.getElementById('material-label')) document.getElementById('material-label').textContent = '✅ 素材画像セット済み';
+
+                updatePreview();
+                alert("データを復元しました！");
+            } catch (err) {
+                console.error("Load Error:", err);
+                alert("データの復元中にエラーが発生しました。データが破損している可能性があります。");
+            }
         }
 
         // ─── Resizer ───
