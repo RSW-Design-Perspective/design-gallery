@@ -1391,7 +1391,13 @@
                 const titleStr = set.title ? `<div class="ba-title">${set.title}</div>` : '';
                 return `<div class="label">Perspective Comparison &nbsp;&nbsp; ${num}</div>
 ${titleStr}
-<div class="ba-wrap"><img src="${beforeSrc}" class="ba-img"><img src="${afterSrc}" class="ba-img after-img"><div class="handle"></div></div>`;
+<div class="ba-wrap">
+    <img src="${beforeSrc}" class="ba-img">
+    <div class="ba-label ba-label-before">BEFORE</div>
+    <img src="${afterSrc}" class="ba-img after-img">
+    <div class="ba-label ba-label-after" style="z-index:3;">AFTER</div>
+    <div class="handle"></div>
+</div>`;
             }).join('\n');
 
             // 素材セクション
@@ -1419,6 +1425,7 @@ ${titleStr}
                         <div class="cta-btns">
                             <a href="https://line.me/ti/p/" class="cta-btn line-btn" target="_blank">LINEで相談する</a>
                             <a href="tel:0000000000" class="cta-btn tel-btn">電話で問い合わせる</a>
+                            <a href="#" class="cta-btn sns-btn ig-btn" target="_blank">Instagramを見る</a>
                             <a href="#" class="cta-btn sns-btn" target="_blank">SNS事例を見る</a>
                         </div>
                     </div>
