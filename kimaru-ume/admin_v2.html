@@ -940,8 +940,6 @@
         let currentStyle = 'luxury';
         let heroUploaded = false;
         const ANALYTICS_ID = "G-9KY5C7XC36";
-        // 仕様変更に対応したプロモデルを指定（無料枠でも稼働率が高い）
-        const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=";
 
         // --- Gemini Key Management ---
         function toggleGeminiKey() {
@@ -1180,7 +1178,27 @@
                 ※出力ルール: カギカッコ不要、1行に1案ずつ、合計3行のみ出力すること。`;
 
                 try {
-                    const res = await fetch(GEMINI_API_URL + apiKey, {
+                    // 自動モデル判定機能 (2026年以降のモデル名アップデート・非推奨化に自動追従)
+                    let targetModel = "gemini-1.5-flash"; // フェイルセーフ用初期値
+                    try {
+                        const mRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+                        if (mRes.ok) {
+                            const mData = await mRes.json();
+                            const validModels = (mData.models || [])
+                                .filter(m => m.supportedGenerationMethods && m.supportedGenerationMethods.includes("generateContent"))
+                                .map(m => m.name.replace("models/", ""));
+
+                            if (validModels.length > 0) {
+                                // flashを優先、無ければpro、無ければ配列の最初を利用
+                                targetModel = validModels.find(m => m.includes("flash")) || validModels.find(m => m.includes("pro")) || validModels[0];
+                                console.log("✅ Auto-selected Gemini Model:", targetModel, "(Available:", validModels, ")");
+                            }
+                        }
+                    } catch (e) { console.warn("Model Discovery Failed:", e); }
+
+                    const dynamicApiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`;
+
+                    const res = await fetch(dynamicApiUrl, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
@@ -1195,15 +1213,20 @@
 
                         let userFriendlyMessage = `【Gemini API連携エラー】\nエラー内容: ${errMsg}\n`;
                         if (errCode === 400) {
-                            userFriendlyMessage += "▶ 考えられる原因: APIキーの入力間違いです。前後に空白が入っていないか確認してください。";
+                            userFriendlyMessage += "▶ 考えられる原因: APIキーの入力間違い等です。前後に空白が入っていないか確認してください。";
                         } else if (errCode === 403) {
-                            userFriendlyMessage += "▶ 考えられる原因: Google AI Studio側で、このAPIキーに紐づくプロジェクトの利用設定が完了していないか、権限がありません。";
+                            userFriendlyMessage += "▶ 考えられる原因: Google AI Studio側で、このAPIキーに紐づくプロジェクトの設定が不完全か、権限がありません。";
                         } else if (errCode === 404) {
-                            userFriendlyMessage += "▶ 考えられる原因: Google側の仕様変更により指定したモデルが見つかりません。";
+                            userFriendlyMessage += "▶ 考えられる原因: 指定したAIモデルにアクセスする権限がありません（無償枠の制限等）。";
                         }
+
                         console.error("Gemini API Error Detail:", data);
                         alert(userFriendlyMessage);
                         throw new Error(errMsg);
+                    }
+
+                    if (!data.candidates || data.candidates.length === 0) {
+                        throw new Error("APIからの応答が空でした。");
                     }
 
                     const text = data.candidates[0].content.parts[0].text;
@@ -1211,7 +1234,7 @@
                     renderChips(lines);
                 } catch (err) {
                     console.error("Catch Block err:", err);
-                    header.textContent = "⚠️ APIエラーのためローカルAIに切り替えました (" + err.message.substring(0, 20) + "...)";
+                    header.textContent = "⚠️ APIエラーのためローカルAIに切り替えました";
                     useLocalCopy();
                 }
                 btn.disabled = false;
