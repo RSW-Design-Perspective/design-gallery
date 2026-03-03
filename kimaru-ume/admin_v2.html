@@ -940,8 +940,8 @@
         let currentStyle = 'luxury';
         let heroUploaded = false;
         const ANALYTICS_ID = "G-9KY5C7XC36";
-        // 安定性の高い標準版Flashモデルを明示的に指定
-        const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=";
+        // 仕様変更に対応したプロモデルを指定（無料枠でも稼働率が高い）
+        const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key=";
 
         // --- Gemini Key Management ---
         function toggleGeminiKey() {
