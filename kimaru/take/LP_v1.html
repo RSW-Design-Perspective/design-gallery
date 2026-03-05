@@ -855,7 +855,7 @@
                     oninput="updatePreview()"></textarea>
             </div>
 
-            <div class="section-title">07.5 ｜ フッター画像（※ナイトモード、俯瞰図など）</div>
+            <div class="section-title">07-B ｜ フッター画像（オプション：ナイトモード・俯瞰図など）</div>
             <div class="form-group">
                 <div class="file-upload-area">
                     <span class="upload-icon">🌙</span>
@@ -881,65 +881,80 @@
                     oninput="updatePreview()"></textarea>
             </div>
 
-            <div class="section-title">09 ｜ CTA連絡先情報</div>
-            
+            <div class="section-title">09 ｜ お客様への連絡先ボタン設定</div>
+            <p style="font-size:0.62rem; color:#888; margin-bottom:14px; line-height:1.7;">ここで入力した情報は、<strong
+                    style="color:#ccc;">生成されるLP（提案書ページ）のCTAボタン</strong>として表示されます。<br>空欄のボタンは自動的に非表示になります。</p>
+
             <div class="form-group">
-                <label>LINE URL</label>
+                <label>LINE URL（公式アカウント or 友だち追加リンク）</label>
                 <input type="text" id="cta-line-url" placeholder="https://line.me/ti/p/..." oninput="updatePreview()">
                 <small style="color:#888; margin-top:4px; display:block;">※ 空欄の場合はボタンを非表示にします</small>
             </div>
-            
+
             <div class="form-group">
                 <label>電話番号</label>
                 <input type="text" id="cta-phone" placeholder="09012345678" oninput="updatePreview()">
                 <small style="color:#888; margin-top:4px; display:block;">※ 空欄の場合はボタンを非表示にします</small>
             </div>
-            
+
             <div class="form-group">
                 <label>Instagram URL</label>
                 <input type="text" id="cta-instagram" placeholder="https://instagram.com/..." oninput="updatePreview()">
                 <small style="color:#888; margin-top:4px; display:block;">※ 空欄の場合はボタンを非表示にします</small>
             </div>
-            
-            <div style="background:#1a3a1a; border:1px solid #2d5a2d; padding:12px; border-radius:4px; margin-bottom:20px; text-align:center;">
-                <button style="width:100%; padding:10px; background:#06C755; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;" onclick="saveFixedInfo()">
+
+            <div
+                style="background:#1a3a1a; border:1px solid #2d5a2d; padding:12px; border-radius:4px; margin-bottom:20px; text-align:center;">
+                <button
+                    style="width:100%; padding:10px; background:#06C755; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
+                    onclick="saveFixedInfo()">
                     ✔️ この企業情報を保存（次回から自動入力）
                 </button>
             </div>
-            
-            <div style="background:#1a2a4a; border:1px solid #2d4a6d; padding:12px; border-radius:4px; margin-bottom:20px;">
+
+            <div
+                style="background:#1a2a4a; border:1px solid #2d4a6d; padding:12px; border-radius:4px; margin-bottom:20px;">
                 <p style="font-size:0.75rem; color:#aaf; margin-bottom:10px; letter-spacing:1px;">プレビューをお客さんと共有</p>
                 <div style="display:flex; gap:10px; flex-direction:column;">
-                    <button style="width:100%; padding:10px; background:#4A90E2; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;" onclick="generatePreviewQR()">
+                    <button
+                        style="width:100%; padding:10px; background:#4A90E2; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
+                        onclick="generatePreviewQR()">
                         📱 QRコード表示
                     </button>
-                    <button style="width:100%; padding:10px; background:#50C878; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;" onclick="copyPreviewLink()">
+                    <button
+                        style="width:100%; padding:10px; background:#50C878; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
+                        onclick="copyPreviewLink()">
                         🔗 リンクをコピー
                     </button>
                 </div>
             </div>
-            
+
             <hr style="border:none; border-top:1px solid #333; margin:30px 0;">
-            
-            <div style="background:#2a1a1a; border:1px solid #6d2d2d; padding:12px; border-radius:4px; margin-bottom:20px;">
+
+            <div
+                style="background:#2a1a1a; border:1px solid #6d2d2d; padding:12px; border-radius:4px; margin-bottom:20px;">
                 <p style="font-size:0.75rem; color:#f88; margin-bottom:10px; letter-spacing:1px;">提案書を完成させる</p>
                 <div style="display:flex; gap:10px; flex-direction:column;">
-                    <button style="width:100%; padding:10px; background:#8B4513; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;" onclick="openPreviewFullscreen()">
+                    <button
+                        style="width:100%; padding:10px; background:#8B4513; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
+                        onclick="openPreviewFullscreen()">
                         👁️ プレビューで確認
                     </button>
-                    <button style="width:100%; padding:10px; background:#C9A84C; color:#000; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;" onclick="preparePublish()">
+                    <button
+                        style="width:100%; padding:10px; background:#C9A84C; color:#000; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
+                        onclick="preparePublish()">
                         📥 HTML出力（ダウンロード）
                     </button>
                 </div>
             </div>
-            
-            <div class="section-title">10 ｜ 提案書の送付・宣伝素材の作成</div>
+
+            <div class="section-title">10 ｜ 完成した提案書を送付・宣伝に活用する</div>
 
             <div class="form-group"
                 style="padding:15px; border:1px solid #333; background:#080808; border-radius:4px; margin-bottom:20px;">
-                <label style="color:var(--gold);">① お客様へ直接送る</label>
-                <p style="font-size:0.65rem; color:#888; margin-bottom:10px; line-height:1.5;">下の「公開用
-                    index.htmlを生成」で作成・アップロードしたURLを入力してください。</p>
+                <label style="color:var(--gold);">① GitHub Pages等へ公開後、URLをお客様に送る</label>
+                <p style="font-size:0.65rem; color:#888; margin-bottom:10px; line-height:1.5;">「📥 HTML出力」でダウンロードした
+                    index.html をサーバーにアップロードし、発行されたURLをここに入力してください。</p>
                 <input type="text" id="lp-url" placeholder="https://yoursite.github.io/...">
                 <button class="share-btn share-btn-x" style="width:100%; margin-top:10px; padding:12px;"
                     onclick="doLineShare()">
@@ -1249,10 +1264,8 @@
             } else {
                 // --- 疑似AI (案B) ---
                 header.textContent = "✦ AI(ローカル辞書) が提案しました（タップで選択）";
-                setTimeout(() => {
-                    useLocalCopy();
-                    btn.disabled = false;
-                }, 800);
+                useLocalCopy();
+                btn.disabled = false;
             }
         }
 
@@ -1407,7 +1420,7 @@ ${titleStr}
             const lineUrl = document.getElementById('cta-line-url').value;
             const phoneNum = document.getElementById('cta-phone').value;
             const instagramUrl = document.getElementById('cta-instagram').value;
-            
+
             let ctaButtons = '';
             if (lineUrl) {
                 ctaButtons += `<a href="${lineUrl}" class="cta-btn line-btn" target="_blank">LINEで相談する</a>`;
@@ -1418,7 +1431,7 @@ ${titleStr}
             if (instagramUrl) {
                 ctaButtons += `<a href="${instagramUrl}" class="cta-btn sns-btn ig-btn" target="_blank">Instagramを見る</a>`;
             }
-            
+
             const ctaSec = ctaButtons ? `
             <div class="cta-sec">
                 <div class="cta-box">
@@ -1700,9 +1713,9 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 ctaInstagram: document.getElementById('cta-instagram').value
             };
             localStorage.setItem('kimaru_fixed_info', JSON.stringify(fixedInfo));
-            
+
             // ボタンをフィードバック
-            const btn = event.target;
+            const btn = document.querySelector('[onclick*="saveFixedInfo"]');
             const origText = btn.innerHTML;
             btn.innerHTML = '✔️ 保存しました！';
             btn.style.background = '#06C755';
@@ -1710,11 +1723,11 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 btn.innerHTML = origText;
             }, 2000);
         }
-        
+
         function loadFixedInfo() {
             const savedStr = localStorage.getItem('kimaru_fixed_info');
             if (!savedStr) return;
-            
+
             try {
                 const data = JSON.parse(savedStr);
                 if (data.proposerShop) document.getElementById('proposer-shop').value = data.proposerShop;
@@ -1727,15 +1740,15 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 console.error("Load fixed info error:", err);
             }
         }
-        
+
         // ─── プレビュー共有機能 ───
         function generatePreviewQR() {
             const previewData = encodeURIComponent(JSON.stringify(getCurrentProjectData()));
             const previewUrl = `${window.location.origin}${window.location.pathname}?preview=${previewData}`;
-            
+
             // QRコード生成API（QR Server）
             const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(previewUrl)}`;
-            
+
             // モーダルで表示
             const modal = document.createElement('div');
             modal.style.cssText = `position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;`;
@@ -1751,11 +1764,11 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             `;
             document.body.appendChild(modal);
         }
-        
+
         function copyPreviewLink() {
             const previewData = encodeURIComponent(JSON.stringify(getCurrentProjectData()));
             const previewUrl = `${window.location.origin}${window.location.pathname}?preview=${previewData}`;
-            
+
             navigator.clipboard.writeText(previewUrl).then(() => {
                 alert('プレビューリンクをコピーしました！\n\nお客さんに共有してください。');
             }).catch(err => {
@@ -1769,7 +1782,7 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 alert('プレビューリンクをコピーしました！\n\nお客さんに共有してください。');
             });
         }
-        
+
         function getCurrentProjectData() {
             return {
                 title: document.getElementById('title').value,
@@ -1793,7 +1806,7 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             // デフォルト2セット
             addBaSet();
             addBaSet();
-            
+
             // URLパラメータからプレビューを読み込み
             const urlParams = new URLSearchParams(window.location.search);
             const previewData = urlParams.get('preview');
@@ -1808,11 +1821,11 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             } else {
                 loadFixedInfo();
             }
-            
+
             updatePreview();
             initResizer();
         };
-        
+
         function loadPreviewData(data) {
             // プレビューモードの場合、編集パネルを非表示にすることも可能
             if (data.title) document.getElementById('title').value = data.title;
@@ -1826,15 +1839,18 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             if (data.ctaLineUrl) document.getElementById('cta-line-url').value = data.ctaLineUrl;
             if (data.ctaPhone) document.getElementById('cta-phone').value = data.ctaPhone;
             if (data.ctaInstagram) document.getElementById('cta-instagram').value = data.ctaInstagram;
-            
-            if (data.currentStyle) setStyle(data.currentStyle, document.querySelector(`.style-btn[onclick*="'${data.currentStyle}'"]`));
+
+            if (data.currentStyle) {
+                const styleBtn = document.querySelector(`.style-btn[onclick*="'${data.currentStyle}'"]`);
+                if (styleBtn) setStyle(data.currentStyle, styleBtn);
+            }
             if (data.images) images = data.images;
             if (data.baSets) {
                 baSets = data.baSets;
                 renderBaSets();
             }
         }
-        
+
         // ─── プレビューフルスクリーン表示 ───
         function openPreviewFullscreen() {
             const htmlContent = generateHTML();
