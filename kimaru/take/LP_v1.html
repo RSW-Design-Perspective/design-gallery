@@ -841,15 +841,10 @@
             <div id="ba-sets-container"></div>
             <button class="btn-add-ba" onclick="addBaSet()">＋ &nbsp; セットを追加</button>
 
-            <div class="section-title">07 ｜ 提案素材・参考画像（※任意）</div>
-            <div class="form-group">
-                <div class="file-upload-area">
-                    <span class="upload-icon">🎨</span>
-                    <div class="upload-label" id="material-label">使用する素材・テクスチャ・参考画像をアップロード</div>
-                    <input type="file" accept="image/*" onchange="processImg(this,'material_img','material-label')">
-                </div>
-            </div>
-            <div class="form-group">
+            <div class="section-title">07 ｜ 提案素材・参考画像（複数張追加可能）</div>
+            <div id="material-imgs-container"></div>
+            <button class="btn-add-ba" id="btn-add-material" onclick="addMaterialImg()">＋ &nbsp; 素材画像を追加（最大4枚）</button>
+            <div class="form-group" style="margin-top:12px;">
                 <label>素材の説明文</label>
                 <textarea id="material-desc" rows="2" placeholder="例：既存の土間コンクリートの上に、このような天然石調のローラーストーンを施工します。"
                     oninput="updatePreview()"></textarea>
@@ -1120,6 +1115,76 @@
                 img.src = e.target.result;
             };
             reader.readAsDataURL(input.files[0]);
+        }
+
+        // ─── 素材画像複数管理 ───
+        let materialImgs = []; // [{id, src}]
+        let materialImgIdSeed = 0;
+
+        function addMaterialImg() {
+            if (materialImgs.length >= 4) {
+                alert('素材画像は最大4枚まで登録できます。');
+                return;
+            }
+            const id = ++materialImgIdSeed;
+            materialImgs.push({ id, src: null });
+            renderMaterialImgs();
+        }
+
+        function removeMaterialImg(id) {
+            materialImgs = materialImgs.filter(m => m.id !== id);
+            renderMaterialImgs();
+            updatePreview();
+        }
+
+        function renderMaterialImgs() {
+            const container = document.getElementById('material-imgs-container');
+            if (!container) return;
+            container.innerHTML = '';
+            materialImgs.forEach(m => {
+                const div = document.createElement('div');
+                div.className = 'ba-set';
+                div.style.marginBottom = '8px';
+                div.innerHTML = `
+                    <div class="ba-set-header">
+                        <span class="ba-set-label">🎨 素材画像</span>
+                        <button class="ba-delete-btn" onclick="removeMaterialImg(${m.id})">✕</button>
+                    </div>
+                    <div class="file-upload-area">
+                        <div class="upload-label ${m.src ? 'has-file' : ''}" id="mat-label-${m.id}">
+                            ${m.src ? '✅ 画像セット済み' : '🎨 画像をアップロード'}
+                        </div>
+                        <input type="file" accept="image/*" onchange="processMaterialImg(this,${m.id})">
+                    </div>`;
+                container.appendChild(div);
+            });
+            const btn = document.getElementById('btn-add-material');
+            if (btn) btn.style.display = materialImgs.length >= 4 ? 'none' : 'block';
+        }
+
+        function processMaterialImg(input, id) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = e => {
+                const img = new Image();
+                img.onload = () => {
+                    let w = img.width, h = img.height;
+                    if (w > 1920) { h = h * 1920 / w; w = 1920; }
+                    const canvas = document.createElement('canvas');
+                    canvas.width = w; canvas.height = h;
+                    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+                    const m = materialImgs.find(m => m.id === id);
+                    if (m) {
+                        m.src = canvas.toDataURL('image/jpeg', 0.90);
+                        const lbl = document.getElementById(`mat-label-${id}`);
+                        if (lbl) { lbl.textContent = '✅ 画像セット済み'; lbl.classList.add('has-file'); }
+                        updatePreview();
+                    }
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
         }
 
         // ─── Style ───
@@ -1404,15 +1469,30 @@ ${titleStr}
 </div>`;
             }).join('\n');
 
-            // 素材セクション（横並び：画像左・説明右）
-            const materialSec = images.material_img ? `
-            <div class="label">Material & Texture</div>
-            <div style="display:flex;align-items:center;gap:clamp(24px,4vw,60px);width:92%;max-width:1100px;margin:0 auto 100px;flex-wrap:wrap;">
-                <div style="flex:0 0 55%;min-width:260px;">
-                    <img src="${images.material_img}" style="width:100%;display:block;border:1px solid var(--c-border);border-radius:6px;">
-                </div>
-                ${matDesc ? `<div style="flex:1;min-width:220px;"><p style="font-size:clamp(0.95rem,1.5vw,1.1rem);line-height:2.2;color:var(--c-text);opacity:0.9;letter-spacing:1px;">${matDesc.replace(/\n/g, '<br>')}</p></div>` : ''}
-            </div>` : '';
+            // 素材セクション（複数画像対応ver）
+            const resolvedMaterialImgs = materialImgs.filter(m => m.src);
+            // 既存の images.material_img（単身）も吁れる（下互換）
+            const allMaterialSrcs = resolvedMaterialImgs.map(m => m.src).filter(Boolean);
+            if (images.material_img && allMaterialSrcs.length === 0) allMaterialSrcs.push(images.material_img);
+            let materialSec = '';
+            if (allMaterialSrcs.length > 0) {
+                const imgCount = allMaterialSrcs.length;
+                const imgStyle = imgCount === 1
+                    ? 'width:100%;display:block;border:1px solid var(--c-border);border-radius:6px;'
+                    : 'width:100%;display:block;border:1px solid var(--c-border);border-radius:6px;';
+                const gridStyle = imgCount === 1
+                    ? 'display:flex;align-items:center;gap:clamp(24px,4vw,60px);width:92%;max-width:1100px;margin:0 auto 100px;flex-wrap:wrap;'
+                    : `display:grid;grid-template-columns:repeat(${Math.min(imgCount, 2)},1fr);gap:16px;width:92%;max-width:${imgCount === 1 ? '1100px' : '900px'};margin:0 auto 100px;`;
+                const imgs = allMaterialSrcs.map(src => `<img src="${src}" style="${imgStyle}">`).join('');
+                materialSec = `
+                <div class="label">Material &amp; Texture</div>
+                <div style="width:92%;max-width:1100px;margin:0 auto 100px;display:flex;align-items:flex-start;gap:clamp(24px,4vw,60px);flex-wrap:wrap;">
+                    <div style="flex:0 0 auto;display:grid;grid-template-columns:repeat(${Math.min(imgCount, 2)},1fr);gap:12px;${imgCount <= 2 ? 'max-width:60%;min-width:260px;' : 'width:100%;'};">
+                        ${imgs}
+                    </div>
+                    ${matDesc ? `<div style="flex:1;min-width:200px;align-self:center;"><p style="font-size:clamp(0.95rem,1.5vw,1.1rem);line-height:2.2;color:var(--c-text);opacity:0.9;letter-spacing:1px;">${matDesc.replace(/\n/g, '<br>')}</p></div>` : ''}
+                </div>`;
+            }
 
 
             // フッター関連
@@ -1496,10 +1576,10 @@ body{background:var(--c-bg);color:var(--c-text);font-family:'Noto Serif JP','Cor
 
 .proposer-sec{max-width:640px;margin:100px auto 120px;text-align:center;padding:50px 30px;border:1px solid var(--c-border);border-radius:4px;background:rgba(255,255,255,0.02);}
 .p-label{font-size:.6rem;letter-spacing:6px;color:var(--c-gold);opacity:.7;text-transform:uppercase;font-family:'Cormorant Garamond',serif;margin-bottom:28px;display:block;}
-.p-shop{font-size:1.25rem;letter-spacing:4px;margin-bottom:10px;font-weight:400;}
-.p-name{font-size:1rem;opacity:.75;margin-bottom:28px;letter-spacing:2px;}
+.p-shop{font-size:1.5rem;letter-spacing:4px;margin-bottom:12px;font-weight:400;}
+.p-name{font-size:1.1rem;opacity:.8;margin-bottom:28px;letter-spacing:2px;}
 .p-divider{width:40px;height:1px;background:var(--c-gold);margin:0 auto 28px;opacity:.5;}
-.p-msg{font-size:1rem;line-height:2.2;opacity:.85;}
+.p-msg{font-size:1.1rem;line-height:2.4;opacity:.9;}
 
 /* フッター・CTA追加スタイル */
 .footer-hero{
@@ -1509,16 +1589,13 @@ body{background:var(--c-bg);color:var(--c-text);font-family:'Noto Serif JP','Cor
   background-position:center center;
   background-size:cover;
   background-repeat:no-repeat;
-  background-attachment:fixed;
   display:flex;
   align-items:center;
   justify-content:center;
   text-align:center;
-  image-rendering:high-quality;
-  -webkit-image-rendering:optimize-contrast;
-  filter:brightness(1.04) contrast(1.03);
+  will-change:transform;
 }
-.footer-overlay{position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.35) 60%, rgba(0,0,0,0.6) 100%);backdrop-filter:blur(0.5px);}
+.footer-overlay{position:absolute;inset:0;background:linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.25) 60%, rgba(0,0,0,0.5) 100%);}
 .footer-content{position:relative;z-index:1;padding:0 20px;}
 .footer-catch{color:#fff;font-size:2.4rem;letter-spacing:6px;font-weight:300;margin-bottom:20px;font-family:'Noto Serif JP',serif;text-shadow:0 3px 15px rgba(0,0,0,0.6);}
 .footer-sub{color:var(--c-gold);font-size:1.2rem;letter-spacing:4px;}
@@ -1693,6 +1770,9 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 // BAセットのUI再構築
                 renderBaSets();
 
+                // 素材画像の復元
+                if (data.materialImgs) { materialImgs = data.materialImgs; renderMaterialImgs(); }
+
                 // hero画像アップロードフラグの復元
                 heroUploaded = !!images.hero;
                 if (images.hero) document.getElementById('hero-label').textContent = '✅ メイン画像セット済み';
@@ -1836,6 +1916,7 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 ctaInstagram: document.getElementById('cta-instagram').value,
                 currentStyle: currentStyle,
                 images: images,
+                materialImgs: materialImgs,
                 baSets: baSets
             };
         }
@@ -1883,6 +1964,7 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
                 if (styleBtn) setStyle(data.currentStyle, styleBtn);
             }
             if (data.images) images = data.images;
+            if (data.materialImgs) { materialImgs = data.materialImgs; renderMaterialImgs(); }
             if (data.baSets) {
                 baSets = data.baSets;
                 renderBaSets();
