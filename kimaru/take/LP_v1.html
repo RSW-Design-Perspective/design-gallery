@@ -10,9 +10,12 @@
         rel="stylesheet">
     <style>
         :root {
-            --gold: #C9A84C;
-            --gold-light: #E8D5A3;
-            --gold-dim: rgba(201, 168, 76, 0.3);
+            --primary-blue: #0066FF;
+            --accent-red: #FF3333;
+            --accent-yellow: #FFD700;
+            --gold: #0066FF;
+            --gold-light: #66A3FF;
+            --gold-dim: rgba(0, 102, 255, 0.3);
             --dark: #0e0e0e;
             --panel: #141414;
             --card: #1a1a1a;
@@ -701,7 +704,7 @@
         .btn-publish {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #9a6c18, #C9A84C, #9a6c18);
+            background: linear-gradient(135deg, #0044BB, #0066FF, #0044BB);
             background-size: 200% 100%;
             color: #000;
             border: none;
@@ -1427,11 +1430,11 @@
 
             // スタイル別カラーテーマ定義
             const themeColors = {
-                luxury: { bg: '#000000', text: '#ffffff', gold: '#C9A84C', goldDim: 'rgba(201,168,76,0.2)', border: '#1e1e1e' },
-                modern: { bg: '#ffffff', text: '#111111', gold: '#0e0e0e', goldDim: 'rgba(0,0,0,0.1)', border: '#e0e0e0' },
-                nature: { bg: '#f4f1ea', text: '#2c2b29', gold: '#6b705c', goldDim: 'rgba(107,112,92,0.2)', border: '#d9d4cb' },
-                vintage: { bg: '#1c1c1c', text: '#e0d8c8', gold: '#b87c4c', goldDim: 'rgba(184,124,76,0.2)', border: '#332d29' },
-                resort: { bg: '#0b1d2e', text: '#f0f5fa', gold: '#7eb6d9', goldDim: 'rgba(126,182,217,0.2)', border: '#1a334d' }
+                luxury: { bg: '#000000', text: '#ffffff', gold: '#0066FF', goldDim: 'rgba(0,102,255,0.2)', border: '#1e1e1e' },
+                modern: { bg: '#ffffff', text: '#111111', gold: '#0066FF', goldDim: 'rgba(0,102,255,0.1)', border: '#e0e0e0' },
+                nature: { bg: '#f4f1ea', text: '#2c2b29', gold: '#0066FF', goldDim: 'rgba(0,102,255,0.2)', border: '#d9d4cb' },
+                vintage: { bg: '#1c1c1c', text: '#e0d8c8', gold: '#FF3333', goldDim: 'rgba(255,51,51,0.2)', border: '#332d29' },
+                resort: { bg: '#0b1d2e', text: '#f0f5fa', gold: '#FFD700', goldDim: 'rgba(255,215,0,0.2)', border: '#1a334d' }
             };
             const theme = themeColors[currentStyle] || themeColors.luxury;
 
