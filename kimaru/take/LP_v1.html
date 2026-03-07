@@ -10,9 +10,11 @@
         rel="stylesheet">
     <style>
         :root {
-            --gold: #C9A84C;
-            --gold-light: #E8D5A3;
-            --gold-dim: rgba(201, 168, 76, 0.3);
+            --primary-blue: #0066FF;
+            --accent-red: #FF3333;
+            --accent-yellow: #FFD700;
+            --gold-light: #99BBFF;
+            --gold-dim: rgba(0, 102, 255, 0.3);
             --dark: #0e0e0e;
             --panel: #141414;
             --card: #1a1a1a;
@@ -53,7 +55,7 @@
             font-size: 1.1rem;
             font-weight: 300;
             letter-spacing: 4px;
-            color: var(--gold);
+            color: var(--primary-blue);
             text-transform: uppercase;
         }
 
@@ -93,7 +95,7 @@
 
         .resizer:hover,
         .resizer.dragging {
-            background: var(--gold);
+            background: var(--primary-blue);
         }
 
         .preview-panel {
@@ -143,7 +145,7 @@
         .section-title {
             font-size: 0.6rem;
             letter-spacing: 5px;
-            color: var(--gold);
+            color: var(--primary-blue);
             text-transform: uppercase;
             margin: 28px 0 14px;
             padding-bottom: 8px;
@@ -232,7 +234,7 @@
         }
 
         .file-upload-area .upload-label.has-file {
-            color: var(--gold);
+            color: var(--primary-blue);
         }
 
         .file-upload-area .upload-icon {
@@ -313,8 +315,8 @@
 
         .btn-add-ba:hover {
             border-color: var(--gold-dim);
-            color: var(--gold);
-            background: rgba(201, 168, 76, 0.03);
+            color: var(--primary-blue);
+            background: rgba(0, 102, 255, 0.03);
         }
 
         /* STYLE SELECTOR */
@@ -344,9 +346,9 @@
         }
 
         .style-btn.active {
-            border-color: var(--gold);
-            color: var(--gold);
-            background: rgba(201, 168, 76, 0.06);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
+            background: rgba(0, 102, 255, 0.06);
         }
 
         /* AI COPY BOX */
@@ -374,7 +376,7 @@
 
         .ai-copy-header {
             font-size: 0.58rem;
-            color: var(--gold);
+            color: var(--primary-blue);
             letter-spacing: 4px;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -393,7 +395,7 @@
             width: 12px;
             height: 12px;
             border: 1px solid var(--gold-dim);
-            border-top-color: var(--gold);
+            border-top-color: var(--primary-blue);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             flex-shrink: 0;
@@ -431,8 +433,8 @@
         }
 
         .copy-chip.selected {
-            border-color: var(--gold);
-            color: var(--gold);
+            border-color: var(--primary-blue);
+            color: var(--primary-blue);
         }
 
         /* GEMINI API SETTINGS */
@@ -570,7 +572,7 @@
         }
 
         .contrast-tag.after {
-            color: var(--gold);
+            color: var(--primary-blue);
         }
 
         .contrast-input-wrap textarea {
@@ -583,9 +585,9 @@
         .btn-gen-contrast {
             width: 100%;
             padding: 10px;
-            background: rgba(201, 168, 76, 0.07);
+            background: rgba(0, 102, 255, 0.07);
             border: 1px solid var(--gold-dim);
-            color: var(--gold);
+            color: var(--primary-blue);
             font-size: 0.68rem;
             letter-spacing: 3px;
             cursor: pointer;
@@ -597,7 +599,7 @@
         }
 
         .btn-gen-contrast:hover {
-            background: rgba(201, 168, 76, 0.14);
+            background: rgba(0, 102, 255, 0.14);
         }
 
         .btn-gen-contrast:disabled {
@@ -616,7 +618,7 @@
 
         .contrast-result-header {
             font-size: 0.58rem;
-            color: var(--gold);
+            color: var(--primary-blue);
             letter-spacing: 4px;
             margin-bottom: 10px;
             text-transform: uppercase;
@@ -632,7 +634,7 @@
             gap: 10px;
             margin-bottom: 25px;
             padding: 15px;
-            background: rgba(201, 168, 76, 0.05);
+            background: rgba(0, 102, 255, 0.05);
             border: 1px solid var(--gold-dim);
             border-radius: 6px;
         }
@@ -657,13 +659,13 @@
         }
 
         .btn-data.save {
-            background: rgba(201, 168, 76, 0.1);
-            color: var(--gold);
+            background: rgba(0, 102, 255, 0.1);
+            color: var(--primary-blue);
             border-color: var(--gold-dim);
         }
 
         .btn-data.save:hover {
-            background: rgba(201, 168, 76, 0.2);
+            background: rgba(0, 102, 255, 0.2);
         }
 
         .contrast-chip:hover {
@@ -671,7 +673,7 @@
         }
 
         .contrast-chip.selected {
-            border-color: var(--gold);
+            border-color: var(--primary-blue);
         }
 
         .contrast-chip .chip-before {
@@ -682,7 +684,7 @@
         }
 
         .contrast-chip .chip-arrow {
-            color: var(--gold);
+            color: var(--primary-blue);
             font-size: 0.7rem;
             margin: 3px 0;
         }
@@ -701,9 +703,9 @@
         .btn-publish {
             width: 100%;
             padding: 16px;
-            background: linear-gradient(135deg, #9a6c18, #C9A84C, #9a6c18);
+            background: linear-gradient(135deg, #0044CC, #0066FF, #0044CC);
             background-size: 200% 100%;
-            color: #000;
+            color: #fff;
             border: none;
             font-size: 0.78rem;
             font-weight: 600;
@@ -829,7 +831,7 @@
 
                 <div id="ai-box" class="ai-copy-box" style="display:none; margin-top:10px; margin-bottom:15px;">
                     <div class="ai-copy-header" id="ai-header-text"
-                        style="font-size:0.6rem; color:var(--gold); margin-bottom:8px;">✦ いくつかご提案します（タップで選択）</div>
+                        style="font-size:0.6rem; color:var(--primary-blue); margin-bottom:8px;">✦ いくつかご提案します（タップで選択）</div>
                     <div id="ai-chips"></div>
                 </div>
 
@@ -936,7 +938,7 @@
                         👁️ プレビューで確認
                     </button>
                     <button
-                        style="width:100%; padding:10px; background:#C9A84C; color:#000; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
+                        style="width:100%; padding:10px; background:#0066FF; color:#fff; border:none; border-radius:4px; font-weight:bold; cursor:pointer; font-size:0.85rem;"
                         onclick="preparePublish()">
                         📥 HTML出力（ダウンロード）
                     </button>
@@ -947,7 +949,7 @@
 
             <div class="form-group"
                 style="padding:15px; border:1px solid #333; background:#080808; border-radius:4px; margin-bottom:20px;">
-                <label style="color:var(--gold);">① GitHub Pages等へ公開後、URLをお客様に送る</label>
+                <label style="color:var(--primary-blue);">① GitHub Pages等へ公開後、URLをお客様に送る</label>
                 <p style="font-size:0.65rem; color:#888; margin-bottom:10px; line-height:1.5;">「📥 HTML出力」でダウンロードした
                     index.html をサーバーにアップロードし、発行されたURLをここに入力してください。</p>
                 <input type="text" id="lp-url" placeholder="https://yoursite.github.io/...">
@@ -1427,11 +1429,11 @@
 
             // スタイル別カラーテーマ定義
             const themeColors = {
-                luxury: { bg: '#000000', text: '#ffffff', gold: '#C9A84C', goldDim: 'rgba(201,168,76,0.2)', border: '#1e1e1e' },
-                modern: { bg: '#ffffff', text: '#111111', gold: '#0e0e0e', goldDim: 'rgba(0,0,0,0.1)', border: '#e0e0e0' },
-                nature: { bg: '#f4f1ea', text: '#2c2b29', gold: '#6b705c', goldDim: 'rgba(107,112,92,0.2)', border: '#d9d4cb' },
-                vintage: { bg: '#1c1c1c', text: '#e0d8c8', gold: '#b87c4c', goldDim: 'rgba(184,124,76,0.2)', border: '#332d29' },
-                resort: { bg: '#0b1d2e', text: '#f0f5fa', gold: '#7eb6d9', goldDim: 'rgba(126,182,217,0.2)', border: '#1a334d' }
+                luxury: { bg: '#000000', text: '#ffffff', gold: '#0066FF', goldDim: 'rgba(0,102,255,0.2)', border: '#1e1e1e' },
+                modern: { bg: '#ffffff', text: '#111111', gold: '#0044CC', goldDim: 'rgba(0,68,204,0.1)', border: '#e0e0e0' },
+                nature: { bg: '#f4f1ea', text: '#2c2b29', gold: '#0066FF', goldDim: 'rgba(0,102,255,0.2)', border: '#d9d4cb' },
+                vintage: { bg: '#1c1c1c', text: '#e0d8c8', gold: '#FF3333', goldDim: 'rgba(255,51,51,0.2)', border: '#332d29' },
+                resort: { bg: '#0b1d2e', text: '#f0f5fa', gold: '#FFD700', goldDim: 'rgba(255,215,0,0.2)', border: '#1a334d' }
             };
             const theme = themeColors[currentStyle] || themeColors.luxury;
 
@@ -1617,11 +1619,11 @@ body{background:var(--c-bg);color:var(--c-text);font-family:'Noto Serif JP','Cor
 .ig-btn{background:linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);color:#fff;border:none;}
 .ig-btn:hover{filter:brightness(1.1);color:#fff;transform:translateY(-2px);box-shadow:0 4px 15px rgba(220,39,67,0.3);}
 
-footer{padding:80px 20px;text-align:center;background:#000;border-top:1px solid rgba(201,168,76,0.15);}
+footer{padding:80px 20px;text-align:center;background:#000;border-top:1px solid rgba(0,102,255,0.15);}
 .footer-inner{display:flex;flex-direction:column;align-items:center;gap:16px;}
 .footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.2rem;letter-spacing:8px;color:var(--c-gold);opacity:.8;text-transform:uppercase;}
 .footer-sub{font-size:.6rem;letter-spacing:5px;color:#666;text-transform:uppercase;font-family:'Cormorant Garamond',serif;}
-.footer-line{width:40px;height:1px;background:rgba(201,168,76,0.3);}
+.footer-line{width:40px;height:1px;background:rgba(0,102,255,0.3);}
 </style>
 </head>
 <body>
@@ -1873,11 +1875,11 @@ document.querySelectorAll('.ba-wrap').forEach(wrap=>{
             modal.innerHTML = `
                 <div style="background:#222;padding:30px;border-radius:8px;text-align:center;color:#fff;">
                     <p style="margin-bottom:15px;font-size:0.9rem;">QRコードをスマホで読み込んでください</p>
-                    <img src="${qrUrl}" style="width:300px;height:300px;border:2px solid #C9A84C;">
+                    <img src="${qrUrl}" style="width:300px;height:300px;border:2px solid #0066FF;">
                     <p style="margin-top:15px;font-size:0.75rem;color:#888;word-break:break-all;max-width:350px;margin-left:auto;margin-right:auto;${previewUrl.length > 100 ? 'display:none;' : ''}">
                         ${previewUrl}
                     </p>
-                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px;padding:8px 16px;background:#C9A84C;color:#000;border:none;border-radius:4px;cursor:pointer;">閉じる</button>
+                    <button onclick="this.parentElement.parentElement.remove()" style="margin-top:15px;padding:8px 16px;background:#0066FF;color:#fff;border:none;border-radius:4px;cursor:pointer;">閉じる</button>
                 </div>
             `;
             document.body.appendChild(modal);
